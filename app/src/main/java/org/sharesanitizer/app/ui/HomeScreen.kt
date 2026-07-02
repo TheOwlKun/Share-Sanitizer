@@ -216,13 +216,6 @@ fun HomeScreen(
                             lineHeight = 36.sp,
                             fontWeight = FontWeight.Medium,
                             color = MaterialTheme.colorScheme.onSurface
-                        )
-                        Text(
-                            "v${BuildConfig.VERSION_NAME} · F-Droid",
-                            fontSize = 14.sp,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            modifier = Modifier.padding(top = 4.dp)
-                        )
                     }
                     Box(
                         modifier = Modifier
