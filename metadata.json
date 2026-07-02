@@ -1,0 +1,5 @@
+{
+  "name": "Share Sanitizer",
+  "description": "A privacy-first Android app to sanitize shared text and images.",
+  "requestFramePermissions": []
+}

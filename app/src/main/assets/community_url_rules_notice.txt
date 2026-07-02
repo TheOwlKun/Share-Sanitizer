@@ -1,0 +1,10 @@
+Community URL Rules
+
+This app bundles an offline snapshot of the ClearURLs Rules database:
+https://github.com/ClearURLs/Rules
+
+ClearURLs Rules is licensed under LGPL-3.0.
+The bundled file is renamed to community_url_rules.minify.json so the app can
+present the feature as Community URL Rules while preserving source attribution.
+
+The app does not fetch rules at runtime and does not request network permission.
