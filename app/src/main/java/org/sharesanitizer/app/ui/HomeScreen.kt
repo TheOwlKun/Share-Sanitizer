@@ -216,6 +216,7 @@ fun HomeScreen(
                             lineHeight = 36.sp,
                             fontWeight = FontWeight.Medium,
                             color = MaterialTheme.colorScheme.onSurface
+                        )
                     }
                     Box(
                         modifier = Modifier
