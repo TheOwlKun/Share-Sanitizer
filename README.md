@@ -1,32 +1,51 @@
-# Share Sanitizer
+<div align="center">
+  <img src="fastlane/metadata/android/en-US/images/icon.png" width="128" height="128" alt="Share Sanitizer Icon">
+  
+  <h1>Share Sanitizer</h1>
+  
+  <p><b>A zero-trust, completely offline Android privacy tool to strip tracking metadata from your shared URLs and Images.</b></p>
 
-[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
-[![F-Droid](https://img.shields.io/badge/F--Droid-available-green.svg)](https://f-droid.org)
+  [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+  [![F-Droid](https://img.shields.io/badge/F--Droid-Submission_Pending-orange.svg)](https://gitlab.com/fdroid/rfp/-/issues)
+</div>
 
-A privacy-first Android app that sanitizes shared text and images to remove tracking metadata.
+<br>
+<div align="center">
+  <img src="fastlane/metadata/android/en-US/images/featureGraphic.png" alt="Feature Graphic">
+</div>
 
-## Features
-- **Text Sanitization**: Share a link or block of text with the app. It will detect URLs, remove common tracking parameters (like `utm_source`, `gclid`), and let you share the clean version.
-- **Image Sanitization**: Share one or multiple images with the app. It will decode the pixel data and save a fresh copy, completely removing embedded EXIF metadata (GPS, date, camera info) to protect your privacy before you upload or share it elsewhere.
-- **Fully Offline**: Zero network permissions. No analytics. No tracking. Nothing is uploaded anywhere.
+---
 
-## Privacy & Security
-This application is designed with extreme privacy in mind. It requires **zero permissions** to operate effectively on modern Android devices. 
-- It does not have the `INTERNET` permission, guaranteeing no data can leave your device.
-- It processes all URLs and image pixel data locally using standard Android APIs.
-- Built-in F-Droid installer warning to encourage reproducible, verifiable builds.
+## 🛡️ Core Features
 
-## How to Test Intent Flows
-1. **Text**: Open your browser, select "Share" on a webpage, and choose "Share Sanitizer". The app will intercept the text, show a diff of the removed URL trackers, and provide a button to copy or share the clean version.
-2. **Image**: Open your gallery, select a photo, tap share, and select "Share Sanitizer". The app will strip metadata and present the clean version for saving or further sharing.
+* **URL Tracking Removal**: Seamlessly intercept shared links (or text containing links) and automatically strip out sneaky marketing and analytics parameters (e.g. `utm_source`, `gclid`, `fbclid`). Share the clean link instantly.
+* **Image Metadata Stripping**: When you share a photo to the app, it safely decodes the raw pixel data and strips all embedded EXIF metadata (GPS location, camera make/model, timestamps) before you upload it to social media or messaging platforms.
+* **Zero Trust & Fully Offline**: Share Sanitizer operates entirely on-device. It requires **zero** permissions (not even `INTERNET`). Nothing is ever uploaded, and no analytics are collected.
+* **Material You Design**: A beautiful, modern interface supporting Android 12+ dynamic theming, dark mode, and fluid micro-animations.
 
-## Build Instructions
-This project uses Gradle.
-- **Debug build**: `./gradlew assembleDebug`
-- **Release build**: Create a signed key and configure `signingConfigs` in `app/build.gradle.kts`. Then run `./gradlew assembleRelease`.
+## 📱 How it Works
 
-## Contributing
-Contributions are welcome! Please ensure any new features align with the "zero permissions, fully offline" ethos of the project.
+1. **Text**: Highlight text or click "Share" on a webpage in your browser, and select **Share Sanitizer**. The app intercepts it, highlights the removed trackers, and lets you immediately share the clean version.
+2. **Images**: Select one or multiple photos from your Gallery, tap share, and choose **Share Sanitizer**. It strips the metadata and hands the clean images back to your sharing menu.
+
+## 🛠️ Build Instructions
+
+This project uses modern Android development standards (Kotlin, Jetpack Compose, Material 3) and builds via Gradle.
+
+```bash
+# Clone the repository
+git clone https://github.com/TheOwlKun/Share-Sanitizer.git
+
+# Enter the directory
+cd Share-Sanitizer
+
+# Build the debug APK
+./gradlew assembleDebug
+```
+
+## 🤝 Contributing
+
+Contributions are incredibly welcome! Please ensure any new features strictly align with the "zero permissions, fully offline" ethos of the project.
 
 1. Fork the repository
 2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
@@ -34,5 +53,5 @@ Contributions are welcome! Please ensure any new features align with the "zero p
 4. Push to the branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request
 
-## License
+## 📄 License
 This project is licensed under the GNU General Public License v3.0 - see the [LICENSE](LICENSE) file for details.
