@@ -1,3 +1,6 @@
+import java.util.Properties
+import java.io.FileInputStream
+
 plugins {
   alias(libs.plugins.android.application)
   alias(libs.plugins.kotlin.android)
@@ -8,12 +11,17 @@ android {
   namespace = "org.sharesanitizer.app"
   compileSdk = 36
 
+  dependenciesInfo {
+    includeInApk = false
+    includeInBundle = false
+  }
+
   defaultConfig {
     applicationId = "org.sharesanitizer.app"
     minSdk = 24
     targetSdk = 36
-    versionCode = 1
-    versionName = "1.0.0"
+    versionCode = 2
+    versionName = "1.0.1"
 
     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     vectorDrawables {
@@ -25,11 +33,16 @@ android {
 
   signingConfigs {
     create("release") {
-      val keystorePath = System.getenv("KEYSTORE_PATH") ?: "${rootDir}/my-upload-key.jks"
+      val localProps = Properties()
+      val localPropsFile = rootProject.file("local.properties")
+      if (localPropsFile.exists()) {
+          localProps.load(localPropsFile.inputStream())
+      }
+      val keystorePath = localProps.getProperty("KEYSTORE_PATH") ?: System.getenv("KEYSTORE_PATH") ?: "${rootDir}/release-key.jks"
       storeFile = file(keystorePath)
-      storePassword = System.getenv("KEYSTORE_PASSWORD") ?: "password"
-      keyAlias = System.getenv("KEY_ALIAS") ?: "upload"
-      keyPassword = System.getenv("KEY_PASSWORD") ?: "password"
+      storePassword = localProps.getProperty("KEYSTORE_PASSWORD") ?: System.getenv("KEYSTORE_PASSWORD") ?: "password"
+      keyAlias = localProps.getProperty("KEY_ALIAS") ?: System.getenv("KEY_ALIAS") ?: "share-sanitizer-key"
+      keyPassword = localProps.getProperty("KEY_PASSWORD") ?: System.getenv("KEY_PASSWORD") ?: "password"
     }
   }
 
@@ -38,7 +51,12 @@ android {
       isCrunchPngs = false
       isMinifyEnabled = true
       proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
-      val keystorePath = System.getenv("KEYSTORE_PATH") ?: "${rootDir}/my-upload-key.jks"
+      val localProps = Properties()
+      val localPropsFile = rootProject.file("local.properties")
+      if (localPropsFile.exists()) {
+          localProps.load(localPropsFile.inputStream())
+      }
+      val keystorePath = localProps.getProperty("KEYSTORE_PATH") ?: System.getenv("KEYSTORE_PATH") ?: "${rootDir}/release-key.jks"
       if (file(keystorePath).exists()) {
           signingConfig = signingConfigs.getByName("release")
       }
