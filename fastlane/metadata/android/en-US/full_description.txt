@@ -1,10 +1,11 @@
 Share Sanitizer is a privacy-first Android application designed to clean tracking metadata from text and images before you share them with others or upload them online.
 
 Features:
-• Text Sanitization: Share a link or block of text with the app. It detects URLs, removes common tracking parameters (like utm_source, gclid, and many more), and lets you share the clean version.
-• Image Sanitization: Share one or multiple images with the app. It decodes the raw pixel data and saves a fresh copy, completely dropping embedded EXIF metadata (GPS location, date, camera info) to protect your privacy. Your original files are never overwritten.
-• Fully Offline: Share Sanitizer requires zero permissions to operate. It uses modern Android capabilities (Intents and the Storage Access Framework) to work entirely offline.
-• No Tracking: The app has no network permission, no analytics, no tracking, and no crash reporting.
+
+- Text Sanitization: Share a link or block of text with the app. It detects URLs, removes common tracking parameters (like utm_source, gclid, and many more), and lets you share the clean version.
+- Image Sanitization: Share one or multiple images with the app. It decodes the raw pixel data and saves a fresh copy, completely dropping embedded EXIF metadata (GPS location, date, camera info) to protect your privacy. Your original files are never overwritten.
+- Fully Offline: Share Sanitizer requires zero permissions to operate. It uses modern Android capabilities (Intents and the Storage Access Framework) to work entirely offline.
+- No Tracking: The app has no network permission, no analytics, no tracking, and no crash reporting.
 
 How to use:
 Simply select "Share Sanitizer" from the Android share sheet when sharing text or images from any other app (like your browser or gallery). You can also launch the app directly to paste text or select images manually.
