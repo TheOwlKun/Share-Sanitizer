@@ -27,10 +27,14 @@
 
 ## 🛡️ Core Features
 
-* **URL Tracking Removal**: Seamlessly intercept shared links (or text containing links) and automatically strip out sneaky marketing and analytics parameters (e.g. `utm_source`, `gclid`, `fbclid`). Share the clean link instantly.
-* **Image Metadata Stripping**: When you share a photo to the app, it safely decodes the raw pixel data and strips all embedded EXIF metadata (GPS location, camera make/model, timestamps) before you upload it to social media or messaging platforms.
-* **Zero Trust & Fully Offline**: Share Sanitizer operates entirely on-device. It requires **zero** permissions (not even `INTERNET`). Nothing is ever uploaded, and no analytics are collected.
-* **Material You Design**: A beautiful, modern interface supporting Android 12+ dynamic theming, dark mode, and fluid micro-animations.
+* **URL Tracking Removal**: Intercept shared links and automatically strip 500+ known tracking parameters (e.g. `utm_source`, `gclid`, `fbclid`) plus community-sourced ClearURLs rules.
+* **URL Redirect Unwrapping**: Extract the real destination URL from tracking redirect wrappers used by Google, Facebook, YouTube, LinkedIn, Steam, VK, and more. Includes a generic fallback for unknown redirect domains.
+* **Shortened URL Warning**: Detects 40+ known URL shorteners (bit.ly, t.co, amzn.to, etc.) and warns you that the real destination cannot be verified offline.
+* **Invisible Unicode Stripping**: Detects and removes hidden zero-width characters (U+200B, U+FEFF, etc.) that websites embed in copied text to fingerprint and track users.
+* **Image Metadata Stripping**: Safely decodes raw pixel data and strips all embedded EXIF metadata (GPS location, camera make/model, timestamps) before sharing.
+* **Zero Trust & Fully Offline**: Operates entirely on-device. Requires **zero** permissions (not even `INTERNET`). Nothing is ever uploaded, and no analytics are collected.
+* **Localization Ready**: All user-facing strings are externalized for community translations via F-Droid/IzzyOnDroid Weblate.
+* **Material You Design**: A modern interface supporting Android 12+ dynamic theming, dark mode, and fluid micro-animations.
 
 ## 📱 How it Works
 

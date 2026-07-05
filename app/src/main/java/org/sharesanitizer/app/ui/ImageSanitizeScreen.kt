@@ -9,37 +9,28 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.*
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.slideInVertically
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Save
-import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.core.content.FileProvider
+import org.sharesanitizer.app.R
 import org.sharesanitizer.app.sanitizer.ImageSanitizeResult
-import org.sharesanitizer.app.viewmodel.ShareViewModel
-import java.io.File
-
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontFamily
-
 import org.sharesanitizer.app.ui.theme.ArtisticIcons
-
-import androidx.compose.ui.hapticfeedback.HapticFeedbackType
-import androidx.compose.ui.platform.LocalHapticFeedback
+import org.sharesanitizer.app.viewmodel.ShareViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -52,8 +43,7 @@ fun ImageSanitizeScreen(
     val canUndo by viewModel.canUndoImages.collectAsState()
     val context = LocalContext.current
     val haptic = LocalHapticFeedback.current
-    
-    // Track when processing just finished for animation
+
     var showContent by remember { mutableStateOf(false) }
     LaunchedEffect(isProcessing) {
         if (!isProcessing && results.isNotEmpty()) {
@@ -66,7 +56,6 @@ fun ImageSanitizeScreen(
         if (uri != null) {
             val successfulResults = results.filterIsInstance<ImageSanitizeResult.Success>()
             if (successfulResults.isNotEmpty()) {
-                // If single image, just save to this uri
                 val result = successfulResults.first()
                 try {
                     context.contentResolver.openOutputStream(uri)?.use { out ->
@@ -74,9 +63,7 @@ fun ImageSanitizeScreen(
                             input.copyTo(out)
                         }
                     }
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                }
+                } catch (_: Exception) { }
             }
         }
     }
@@ -86,23 +73,23 @@ fun ImageSanitizeScreen(
         topBar = {
             TopAppBar(
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent),
-                title = { Text("Sanitize Images", fontFamily = FontFamily.Serif) },
+                title = { Text(stringResource(R.string.image_title), fontFamily = FontFamily.Serif) },
                 navigationIcon = {
                     IconButton(onClick = {
                         viewModel.clearImages()
                         onBack()
                     }) {
-                        Icon(ArtisticIcons.ArrowBack, contentDescription = "Back")
+                        Icon(ArtisticIcons.ArrowBack, contentDescription = stringResource(R.string.action_back))
                     }
                 },
                 actions = {
                     if (results.isNotEmpty()) {
                         IconButton(onClick = { viewModel.clearImages() }) {
-                            Icon(ArtisticIcons.Delete, contentDescription = "Clear")
+                            Icon(ArtisticIcons.Delete, contentDescription = stringResource(R.string.image_clear))
                         }
                     } else if (canUndo) {
                         IconButton(onClick = { viewModel.undoClearImages() }) {
-                            Icon(ArtisticIcons.Undo, contentDescription = "Undo")
+                            Icon(ArtisticIcons.Undo, contentDescription = stringResource(R.string.image_undo))
                         }
                     }
                 }
@@ -126,14 +113,14 @@ fun ImageSanitizeScreen(
                                     modifier = Modifier.weight(1f)
                                 ) {
                                     Button(
-                                        onClick = { 
+                                        onClick = {
                                             val result = successfulResults.first()
-                                            saveLauncher.launch(result.outputFile.name) 
+                                            saveLauncher.launch(result.outputFile.name)
                                         }
                                     ) {
                                         Icon(ArtisticIcons.Save, contentDescription = null)
                                         Spacer(Modifier.width(8.dp))
-                                        Text("Save")
+                                        Text(stringResource(R.string.image_save))
                                     }
                                 }
                                 Spacer(Modifier.width(16.dp))
@@ -144,13 +131,11 @@ fun ImageSanitizeScreen(
                                 modifier = Modifier.weight(1f)
                             ) {
                                 Button(
-                                    onClick = {
-                                        shareImages(context, successfulResults)
-                                    }
+                                    onClick = { shareImages(context, successfulResults) }
                                 ) {
                                     Icon(ArtisticIcons.Share, contentDescription = null)
                                     Spacer(Modifier.width(8.dp))
-                                    Text("Share All")
+                                    Text(stringResource(R.string.image_share_all))
                                 }
                             }
                         }
@@ -183,13 +168,13 @@ fun ImageSanitizeScreen(
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Icon(
                         ArtisticIcons.Image,
-                        contentDescription = "Processing...",
+                        contentDescription = stringResource(R.string.image_processing),
                         modifier = Modifier.size(72.dp).scale(scale),
                         tint = MaterialTheme.colorScheme.primary.copy(alpha = alpha)
                     )
                     Spacer(Modifier.height(16.dp))
                     Text(
-                        "Stripping metadata…",
+                        stringResource(R.string.image_stripping),
                         style = MaterialTheme.typography.bodyLarge,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -197,7 +182,7 @@ fun ImageSanitizeScreen(
             }
         } else if (results.isEmpty()) {
             Box(Modifier.fillMaxSize().padding(padding), contentAlignment = Alignment.Center) {
-                Text("No images selected.")
+                Text(stringResource(R.string.image_no_selection))
             }
         } else {
             LazyColumn(
@@ -232,13 +217,13 @@ fun ImageSanitizeScreen(
                                 )
                                 Column {
                                     Text(
-                                        "Metadata Stripped",
+                                        stringResource(R.string.image_metadata_stripped),
                                         style = MaterialTheme.typography.titleMedium,
                                         fontWeight = FontWeight.Bold
                                     )
                                     Spacer(Modifier.height(4.dp))
                                     Text(
-                                        "Fresh copies created without embedded metadata (location, camera, timestamps). Originals are untouched.",
+                                        stringResource(R.string.image_metadata_body),
                                         style = MaterialTheme.typography.bodyMedium
                                     )
                                 }
@@ -246,7 +231,7 @@ fun ImageSanitizeScreen(
                         }
                     }
                 }
-                
+
                 itemsIndexed(results) { index, result ->
                     AnimatedVisibility(
                         visible = showContent,
@@ -268,22 +253,21 @@ fun ImageSanitizeScreen(
                                             fontWeight = FontWeight.Bold
                                         )
                                         Spacer(Modifier.height(12.dp))
-                                        
-                                        // Size comparison with reduction percentage
+
                                         Row(
                                             Modifier.fillMaxWidth(),
                                             horizontalArrangement = Arrangement.SpaceBetween
                                         ) {
                                             Column {
-                                                Text("Original", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                                Text(stringResource(R.string.image_original), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                                                 Text(formatSize(result.originalSize), style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Medium)
                                             }
                                             Column {
-                                                Text("Cleaned", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                                Text(stringResource(R.string.image_cleaned), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                                                 Text(formatSize(result.outputSize), style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Medium)
                                             }
                                             Column(horizontalAlignment = Alignment.End) {
-                                                Text("Change", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                                Text(stringResource(R.string.image_change), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                                                 val changePercent = if (result.originalSize > 0) {
                                                     ((result.outputSize.toDouble() - result.originalSize.toDouble()) / result.originalSize.toDouble() * 100).toInt()
                                                 } else 0
@@ -297,17 +281,17 @@ fun ImageSanitizeScreen(
                                                 )
                                             }
                                         }
-                                        
+
                                         Spacer(Modifier.height(8.dp))
                                         HorizontalDivider(color = MaterialTheme.colorScheme.surfaceVariant)
                                         Spacer(Modifier.height(8.dp))
-                                        
+
                                         Row(
                                             Modifier.fillMaxWidth(),
                                             horizontalArrangement = Arrangement.SpaceBetween
                                         ) {
                                             Text(
-                                                "Output: ${result.outputFile.name}",
+                                                stringResource(R.string.image_output, result.outputFile.name),
                                                 style = MaterialTheme.typography.bodySmall,
                                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                                             )
@@ -328,7 +312,7 @@ fun ImageSanitizeScreen(
                                     colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.errorContainer)
                                 ) {
                                     Column(Modifier.padding(20.dp)) {
-                                        Text("Error processing image", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onErrorContainer)
+                                        Text(stringResource(R.string.image_error_title), style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onErrorContainer)
                                         Spacer(Modifier.height(8.dp))
                                         Text(result.error, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onErrorContainer)
                                     }
@@ -337,7 +321,7 @@ fun ImageSanitizeScreen(
                         }
                     }
                 }
-                
+
                 item { Spacer(Modifier.height(80.dp)) }
             }
         }
@@ -352,25 +336,25 @@ private fun formatSize(bytes: Long): String {
 }
 
 private fun shareImages(context: Context, results: List<ImageSanitizeResult.Success>) {
-    val uris = results.map { 
+    val uris = results.map {
         FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", it.outputFile)
     }
-    
+
     if (uris.isEmpty()) return
-    
+
     if (uris.size == 1) {
         val intent = Intent(Intent.ACTION_SEND).apply {
             type = "image/*"
             putExtra(Intent.EXTRA_STREAM, uris.first())
             addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         }
-        context.startActivity(Intent.createChooser(intent, "Share Cleaned Image"))
+        context.startActivity(Intent.createChooser(intent, context.getString(R.string.image_share_single_chooser)))
     } else {
         val intent = Intent(Intent.ACTION_SEND_MULTIPLE).apply {
             type = "image/*"
             putParcelableArrayListExtra(Intent.EXTRA_STREAM, ArrayList(uris))
             addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         }
-        context.startActivity(Intent.createChooser(intent, "Share Cleaned Images"))
+        context.startActivity(Intent.createChooser(intent, context.getString(R.string.image_share_multi_chooser)))
     }
 }

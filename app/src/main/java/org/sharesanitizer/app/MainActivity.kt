@@ -33,14 +33,11 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Clean up stale cache from previous sessions (more reliable than onDestroy)
         cleanCacheIfEnabled()
 
         try {
             org.woheller69.freeDroidWarn.FreeDroidWarn.showWarningOnUpgrade(this, R.mipmap.ic_launcher)
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
+        } catch (_: Exception) { }
 
         enableEdgeToEdge()
         setContent {
@@ -149,8 +146,6 @@ class MainActivity : ComponentActivity() {
                     cacheDir.deleteRecursively()
                 }
             }
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
+        } catch (_: Exception) { }
     }
 }

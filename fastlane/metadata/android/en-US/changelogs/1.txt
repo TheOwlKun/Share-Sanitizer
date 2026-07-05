@@ -1,6 +1,6 @@
 Initial release of Share Sanitizer!
-- Remove tracking parameters from URLs (supports 42+ known parameters)
-- Strip EXIF metadata from shared images (GPS, timestamps, camera info)
-- Batch process multiple images at once
-- Fully offline with zero permissions (no network access)
-- Material You dynamic theming and beautiful animations
+• Remove tracking parameters from URLs (supports 42+ known parameters)
+• Strip EXIF metadata from shared images (GPS, timestamps, camera info)
+• Batch process multiple images at once
+• Fully offline with zero permissions (no network access)
+• Material You dynamic theming and beautiful animations
