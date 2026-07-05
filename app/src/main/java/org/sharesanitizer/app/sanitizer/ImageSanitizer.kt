@@ -29,7 +29,6 @@ object ImageSanitizer {
                 .sanitizeFileComponent()
                 .ifBlank { "image_${UUID.randomUUID().toString().take(8)}" }
 
-            // Determine format
             val mimeType = context.contentResolver.getType(uri)?.lowercase() ?: "image/jpeg"
             if (mimeType.contains("gif")) {
                 return@withContext ImageSanitizeResult.Error(
@@ -57,14 +56,10 @@ object ImageSanitizer {
             val safeSuffix = filenameSuffix.sanitizeFileComponent().ifBlank { "_clean" }
             val outFilename = "$safeBaseName$safeSuffix.$ext"
             
-            // Create cache file
             val cacheDir = File(context.cacheDir, "shared_images").apply { mkdirs() }
             val outFile = uniqueFile(cacheDir, outFilename)
             
-            // Decode without metadata (just raw pixels)
-            val options = BitmapFactory.Options().apply {
-                inJustDecodeBounds = true
-            }
+            val options = BitmapFactory.Options().apply { inJustDecodeBounds = true }
             context.contentResolver.openInputStream(uri)?.use { 
                 BitmapFactory.decodeStream(it, null, options)
             }
@@ -75,16 +70,12 @@ object ImageSanitizer {
             val originalSize = getFileSize(context, uri)
             val orientation = readExifOrientation(context, uri)
             
-            // Prevent OOM for huge images (e.g. > 4000px)
             var scale = 1
             while (options.outWidth / scale > 4000 || options.outHeight / scale > 4000) {
                 scale *= 2
             }
             
-            val decodeOptions = BitmapFactory.Options().apply {
-                inSampleSize = scale
-                // Ensure no color space weirdness or exif is kept
-            }
+            val decodeOptions = BitmapFactory.Options().apply { inSampleSize = scale }
             
             val decodedBitmap = context.contentResolver.openInputStream(uri)?.use {
                 BitmapFactory.decodeStream(it, null, decodeOptions)
@@ -137,9 +128,7 @@ object ImageSanitizer {
                         }
                     }
                 }
-            } catch (e: Exception) {
-                // ignore
-            }
+            } catch (_: Exception) { }
         }
         if (name == null) {
             name = uri.path?.substringAfterLast('/')
@@ -158,9 +147,7 @@ object ImageSanitizer {
                         }
                     }
                 }
-            } catch (e: Exception) {
-                // ignore
-            }
+            } catch (_: Exception) { }
         }
         if (uri.scheme == "file") {
             return uri.path?.let { File(it).length() } ?: 0L
@@ -256,4 +243,3 @@ sealed class ImageSanitizeResult {
     
     data class Error(val uri: Uri, val error: String) : ImageSanitizeResult()
 }
-

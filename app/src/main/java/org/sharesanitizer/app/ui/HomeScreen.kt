@@ -14,8 +14,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -23,15 +21,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import org.sharesanitizer.app.BuildConfig
-import org.sharesanitizer.app.viewmodel.ShareViewModel
-
-import androidx.compose.ui.platform.LocalContext
+import org.sharesanitizer.app.R
 import org.sharesanitizer.app.ui.theme.ArtisticIcons
-import androidx.compose.ui.text.font.FontFamily
+import org.sharesanitizer.app.viewmodel.ShareViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -44,12 +42,10 @@ fun HomeScreen(
 ) {
     var showPermissionsDialog by remember { mutableStateOf(false) }
     var showInstallerDialog by remember { mutableStateOf(false) }
-    
-    // Entrance animation state
+
     var visible by remember { mutableStateOf(false) }
     LaunchedEffect(Unit) { visible = true }
-    
-    // Shield pulse animation
+
     val infiniteTransition = rememberInfiniteTransition(label = "shield_pulse")
     val shieldScale by infiniteTransition.animateFloat(
         initialValue = 1f,
@@ -60,7 +56,7 @@ fun HomeScreen(
         ),
         label = "shield_scale"
     )
-    
+
     val context = LocalContext.current
     LaunchedEffect(Unit) {
         val installer = try {
@@ -70,32 +66,32 @@ fun HomeScreen(
                 @Suppress("DEPRECATION")
                 context.packageManager.getInstallerPackageName(context.packageName)
             }
-        } catch (e: Exception) { null }
-        
+        } catch (_: Exception) { null }
+
         if (installer == "com.android.vending") {
             showInstallerDialog = true
         }
     }
-    
+
     val imageLauncher = rememberLauncherForActivityResult(ActivityResultContracts.GetMultipleContents()) { uris: List<Uri> ->
         if (uris.isNotEmpty()) {
             shareViewModel.sanitizeImages(uris)
             onNavigateToImage()
         }
     }
-    
+
     var showPasteDialog by remember { mutableStateOf(false) }
 
     if (showPasteDialog) {
         var pastedText by remember { mutableStateOf("") }
         AlertDialog(
             onDismissRequest = { showPasteDialog = false },
-            title = { Text("Paste Text", fontFamily = FontFamily.Serif) },
+            title = { Text(stringResource(R.string.paste_title), fontFamily = FontFamily.Serif) },
             text = {
                 OutlinedTextField(
                     value = pastedText,
                     onValueChange = { pastedText = it },
-                    label = { Text("Text to sanitize") },
+                    label = { Text(stringResource(R.string.paste_label)) },
                     modifier = Modifier.fillMaxWidth().imePadding(),
                     minLines = 3
                 )
@@ -108,11 +104,11 @@ fun HomeScreen(
                         onNavigateToText()
                     }
                 }) {
-                    Text("Sanitize")
+                    Text(stringResource(R.string.paste_confirm))
                 }
             },
             dismissButton = {
-                TextButton(onClick = { showPasteDialog = false }) { Text("Cancel") }
+                TextButton(onClick = { showPasteDialog = false }) { Text(stringResource(R.string.paste_cancel)) }
             },
             properties = androidx.compose.ui.window.DialogProperties(
                 decorFitsSystemWindows = false
@@ -123,10 +119,10 @@ fun HomeScreen(
     if (showPermissionsDialog) {
         AlertDialog(
             onDismissRequest = { showPermissionsDialog = false },
-            title = { Text("Zero Permissions Promise", fontFamily = FontFamily.Serif) },
-            text = { Text("Share Sanitizer uses modern Android capabilities (Intents and the Storage Access Framework) to operate without asking for broad permissions. It does not need camera, microphone, or full storage access to keep your data safe and private.") },
+            title = { Text(stringResource(R.string.home_permissions_title), fontFamily = FontFamily.Serif) },
+            text = { Text(stringResource(R.string.home_permissions_body)) },
             confirmButton = {
-                TextButton(onClick = { showPermissionsDialog = false }) { Text("Got it") }
+                TextButton(onClick = { showPermissionsDialog = false }) { Text(stringResource(R.string.home_permissions_ok)) }
             }
         )
     }
@@ -134,10 +130,10 @@ fun HomeScreen(
     if (showInstallerDialog) {
         AlertDialog(
             onDismissRequest = { showInstallerDialog = false },
-            title = { Text("F-Droid Recommended", fontFamily = FontFamily.Serif) },
-            text = { Text("We noticed this app was not installed via F-Droid. For the best privacy guarantees and reproducible builds, we strongly recommend obtaining Share Sanitizer from the official F-Droid repository.") },
+            title = { Text(stringResource(R.string.home_installer_title), fontFamily = FontFamily.Serif) },
+            text = { Text(stringResource(R.string.home_installer_body)) },
             confirmButton = {
-                TextButton(onClick = { showInstallerDialog = false }) { Text("Okay") }
+                TextButton(onClick = { showInstallerDialog = false }) { Text(stringResource(R.string.home_installer_ok)) }
             }
         )
     }
@@ -154,7 +150,7 @@ fun HomeScreen(
                     selected = true,
                     onClick = { },
                     icon = { Icon(ArtisticIcons.Home, contentDescription = null) },
-                    label = { Text("Home", fontWeight = FontWeight.Bold) },
+                    label = { Text(stringResource(R.string.nav_home), fontWeight = FontWeight.Bold) },
                     colors = NavigationBarItemDefaults.colors(
                         indicatorColor = MaterialTheme.colorScheme.secondaryContainer,
                         selectedIconColor = MaterialTheme.colorScheme.onSecondaryContainer,
@@ -167,7 +163,7 @@ fun HomeScreen(
                     selected = false,
                     onClick = onNavigateToSettings,
                     icon = { Icon(ArtisticIcons.Settings, contentDescription = null) },
-                    label = { Text("Settings") },
+                    label = { Text(stringResource(R.string.nav_settings)) },
                     colors = NavigationBarItemDefaults.colors(
                         unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
                         unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant
@@ -177,7 +173,7 @@ fun HomeScreen(
                     selected = false,
                     onClick = onNavigateToAbout,
                     icon = { Icon(ArtisticIcons.Info, contentDescription = null) },
-                    label = { Text("About") },
+                    label = { Text(stringResource(R.string.nav_about)) },
                     colors = NavigationBarItemDefaults.colors(
                         unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
                         unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant
@@ -193,7 +189,6 @@ fun HomeScreen(
                 .imePadding()
                 .verticalScroll(rememberScrollState())
         ) {
-            // Header with staggered entrance animation
             AnimatedVisibility(
                 visible = visible,
                 enter = fadeIn(animationSpec = tween(600)) + slideInVertically(
@@ -210,7 +205,7 @@ fun HomeScreen(
                 ) {
                     Column {
                         Text(
-                            "Share\nSanitizer",
+                            stringResource(R.string.home_title),
                             fontSize = 32.sp,
                             fontFamily = FontFamily.Serif,
                             lineHeight = 36.sp,
@@ -235,7 +230,6 @@ fun HomeScreen(
                 }
             }
 
-            // Privacy Banner with entrance animation
             AnimatedVisibility(
                 visible = visible,
                 enter = fadeIn(animationSpec = tween(600, delayMillis = 150)) + slideInVertically(
@@ -275,13 +269,13 @@ fun HomeScreen(
                         Spacer(modifier = Modifier.width(16.dp))
                         Column {
                             Text(
-                                "Privacy Promise",
+                                stringResource(R.string.home_privacy_title),
                                 fontSize = 14.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = MaterialTheme.colorScheme.onSecondaryContainer
                             )
                             Text(
-                                "Processed locally. Zero permissions required.",
+                                stringResource(R.string.home_privacy_subtitle),
                                 fontSize = 12.sp,
                                 color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.8f)
                             )
@@ -290,7 +284,6 @@ fun HomeScreen(
                 }
             }
 
-            // Main Content Grid (Action Cards) with staggered entrance
             AnimatedVisibility(
                 visible = visible,
                 enter = fadeIn(animationSpec = tween(600, delayMillis = 300)) + slideInVertically(
@@ -306,26 +299,25 @@ fun HomeScreen(
                 ) {
                     Box(modifier = Modifier.weight(1f)) {
                         HomeActionCard(
-                            title = "Sanitize\nURLs",
-                            subtitle = "Strip trackers",
+                            title = stringResource(R.string.home_sanitize_urls_title),
+                            subtitle = stringResource(R.string.home_sanitize_urls_subtitle),
                             icon = ArtisticIcons.Link,
                             onClick = { showPasteDialog = true }
                         )
                     }
                     Box(modifier = Modifier.weight(1f)) {
                         HomeActionCard(
-                            title = "Clean\nImage",
-                            subtitle = "Remove EXIF",
+                            title = stringResource(R.string.home_clean_image_title),
+                            subtitle = stringResource(R.string.home_clean_image_subtitle),
                             icon = ArtisticIcons.Image,
                             onClick = { imageLauncher.launch("image/*") }
                         )
                     }
                 }
             }
-            
+
             Spacer(modifier = Modifier.height(16.dp))
-            
-            // Additional Content Grid with staggered entrance
+
             AnimatedVisibility(
                 visible = visible,
                 enter = fadeIn(animationSpec = tween(600, delayMillis = 450)) + slideInVertically(
@@ -341,25 +333,25 @@ fun HomeScreen(
                 ) {
                     Box(modifier = Modifier.weight(1f)) {
                         HomeActionCard(
-                            title = "Batch\nProcess",
-                            subtitle = "Multiple items",
+                            title = stringResource(R.string.home_batch_title),
+                            subtitle = stringResource(R.string.home_batch_subtitle),
                             icon = ArtisticIcons.Collections,
                             onClick = { imageLauncher.launch("image/*") }
                         )
                     }
                     Box(modifier = Modifier.weight(1f)) {
                         HomeActionCard(
-                            title = "Pick\nFiles",
-                            subtitle = "Manual selection",
+                            title = stringResource(R.string.home_pick_files_title),
+                            subtitle = stringResource(R.string.home_pick_files_subtitle),
                             icon = ArtisticIcons.Folder,
                             onClick = { imageLauncher.launch("image/*") }
                         )
                     }
                 }
             }
-            
+
             Spacer(modifier = Modifier.height(24.dp))
-            
+
             val history by shareViewModel.history.collectAsState()
             if (history.isNotEmpty()) {
                 AnimatedVisibility(
@@ -375,7 +367,7 @@ fun HomeScreen(
                             .padding(horizontal = 24.dp)
                     ) {
                         Text(
-                            "Recent History",
+                            stringResource(R.string.home_recent_history),
                             fontSize = 18.sp,
                             fontFamily = FontFamily.Serif,
                             fontWeight = FontWeight.SemiBold,
@@ -417,8 +409,7 @@ fun HomeScreen(
                 }
                 Spacer(modifier = Modifier.height(24.dp))
             }
-            
-            // Share instructions card
+
             AnimatedVisibility(
                 visible = visible,
                 enter = fadeIn(animationSpec = tween(600, delayMillis = 700)) + slideInVertically(
@@ -440,14 +431,14 @@ fun HomeScreen(
                         Icon(ArtisticIcons.Share, contentDescription = null, tint = MaterialTheme.colorScheme.onSurfaceVariant)
                         Spacer(modifier = Modifier.width(16.dp))
                         Text(
-                            text = "You can also share items directly into this app from anywhere on your device.",
+                            text = stringResource(R.string.home_share_hint),
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
                 }
             }
-            
+
             Spacer(modifier = Modifier.height(24.dp))
         }
     }

@@ -19,6 +19,8 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
 
     val trimWhitespace = repository.trimWhitespace.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
     val collapseLines = repository.collapseLines.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
+    val stripInvisibleChars = repository.stripInvisibleChars.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), true)
+    val unwrapRedirects = repository.unwrapRedirects.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), true)
     val exportFormat = repository.exportFormat.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), "ORIGINAL")
     val imageQuality = repository.imageQuality.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 90)
     val filenameSuffix = repository.filenameSuffix.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), "_clean")
@@ -28,14 +30,18 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
 
     fun setTrimWhitespace(value: Boolean) = viewModelScope.launch { repository.setTrimWhitespace(value) }
     fun setCollapseLines(value: Boolean) = viewModelScope.launch { repository.setCollapseLines(value) }
+    fun setStripInvisibleChars(value: Boolean) = viewModelScope.launch { repository.setStripInvisibleChars(value) }
+    fun setUnwrapRedirects(value: Boolean) = viewModelScope.launch { repository.setUnwrapRedirects(value) }
     fun setExportFormat(format: String) = viewModelScope.launch { repository.setExportFormat(format) }
     fun setImageQuality(quality: Int) = viewModelScope.launch { repository.setImageQuality(quality) }
     fun setFilenameSuffix(suffix: String) = viewModelScope.launch { repository.setFilenameSuffix(suffix) }
     fun setAutoDeleteCache(value: Boolean) = viewModelScope.launch { repository.setAutoDeleteCache(value) }
     fun setThemePreference(theme: Int) = viewModelScope.launch { repository.setThemePreference(theme) }
+
     fun addCustomParam(param: String) {
         if (param.isNotBlank()) viewModelScope.launch { repository.addCustomTrackingParam(param) }
     }
+
     fun removeCustomParam(param: String) = viewModelScope.launch { repository.removeCustomTrackingParam(param) }
 
     fun importFilterList(uri: Uri, onResult: (Int) -> Unit) {
@@ -46,27 +52,24 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
                     val reader = BufferedReader(InputStreamReader(inputStream))
                     val pattern = Pattern.compile("removeparam=([a-zA-Z0-9_-]+)", Pattern.CASE_INSENSITIVE)
                     val newParams = mutableSetOf<String>()
-                    
+
                     var line: String?
                     while (reader.readLine().also { line = it } != null) {
                         val matcher = pattern.matcher(line!!)
                         while (matcher.find()) {
-                            newParams.add(matcher.group(1).lowercase().trim())
+                            matcher.group(1)?.let { newParams.add(it.lowercase().trim()) }
                         }
                     }
-                    
+
                     for (param in newParams) {
                         repository.addCustomTrackingParam(param)
                         addedCount++
                     }
                 }
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
+            } catch (_: Exception) { }
             withContext(Dispatchers.Main) {
                 onResult(addedCount)
             }
         }
     }
 }
-

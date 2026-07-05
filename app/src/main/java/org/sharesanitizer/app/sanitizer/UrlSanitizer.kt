@@ -97,14 +97,26 @@ object UrlSanitizer {
         "redirect", "ref", "source", "src", "tag", "url", "version"
     )
 
-    private val urlRegex = "(?i)\\b((?:https?://|www\\d{0,3}[.]|[a-z0-9.\\-]+[.][a-z]{2,63}(?=[/?#]))(?:[^\\s()<>]+|\\((?:[^\\s()<>]+|(?:\\([^\\s()<>]+\\)))*\\))+(?:\\((?:[^\\s()<>]+|(?:\\([^\\s()<>]+\\)))*\\)|[^\\s`!()\\[\\]{};:'\".,<>?«»“”‘’]))".toRegex()
+    private val shortenerDomains = setOf(
+        "bit.ly", "tinyurl.com", "goo.gl", "t.co", "ow.ly", "is.gd", "v.gd",
+        "buff.ly", "j.mp", "rb.gy", "cutt.ly", "shorturl.at", "tiny.cc",
+        "bl.ink", "lnkd.in", "db.tt", "qr.ae", "adf.ly", "bit.do",
+        "mcaf.ee", "su.pr", "dlvr.it", "soo.gd", "s2r.co", "clk.sh",
+        "rebrand.ly", "short.io", "hypr.ink",
+        "t.ly", "linktr.ee", "shor.by", "trib.al",
+        "amzn.to", "amzn.eu", "a.co", "youtu.be", "redd.it",
+        "fb.me", "fb.watch", "wa.me", "pin.it", "spoti.fi"
+    )
+
+    private val urlRegex = "(?i)\\b((?:https?://|www\\d{0,3}[.]|[a-z0-9.\\-]+[.][a-z]{2,63}(?=[/?#]))(?:[^\\s()<>]+|\\((?:[^\\s()<>]+|(?:\\([^\\s()<>]+\\)))*\\))+(?:\\((?:[^\\s()<>]+|(?:\\([^\\s()<>]+\\)))*\\)|[^\\s`!()\\[\\]{};:'\".,<>?«»“”‘’']))".toRegex()
 
     fun sanitizeText(
         text: String,
         additionalParams: Set<String> = emptySet(),
         trimWhitespace: Boolean = false,
         collapseLines: Boolean = false,
-        communityRules: CommunityUrlRules? = null
+        communityRules: CommunityUrlRules? = null,
+        unwrapRedirects: Boolean = false
     ): SanitizeResult {
         val customParams = additionalParams
             .map { it.lowercase().trim() }
@@ -115,6 +127,7 @@ object UrlSanitizer {
             .filter { it.isNotEmpty() }
             .toSet()
         val removedParams = mutableListOf<RemovedParam>()
+        val detectedShorteners = mutableListOf<String>()
         var cleanedText = text
 
         val matches = urlRegex.findAll(text).toList().reversed()
@@ -122,15 +135,28 @@ object UrlSanitizer {
         for (match in matches) {
             val originalUrlString = match.value
             try {
-                // Ensure URI can parse it (handle missing scheme)
-                val uriStr = if (!originalUrlString.startsWith("http", ignoreCase = true)) "http://$originalUrlString" else originalUrlString
+                var workingUrl = originalUrlString
+                var wasUnwrapped = false
+                if (unwrapRedirects) {
+                    val unwrapResult = RedirectUnwrapper.unwrap(originalUrlString)
+                    if (unwrapResult.wasUnwrapped) {
+                        workingUrl = unwrapResult.url
+                        wasUnwrapped = true
+                    }
+                }
+                val uriStr = if (!workingUrl.startsWith("http", ignoreCase = true)) "http://$workingUrl" else workingUrl
                 val uri = URI(uriStr)
+                val host = uri.host?.lowercase()
+
+                if (host != null && shortenerDomains.any { host == it || host.endsWith(".$it") }) {
+                    detectedShorteners.add(originalUrlString)
+                }
+
                 val communityRulePatterns = communityRules?.rulesFor(uriStr).orEmpty()
                 
                 var isModified = false
                 val paramsRemovedFromThisUrl = mutableListOf<String>()
-                
-                // 1. Process Path
+
                 var newPath = uri.rawPath
                 if (newPath != null) {
                     val segments = newPath.split("/")
@@ -157,7 +183,6 @@ object UrlSanitizer {
                     }
                 }
 
-                // 2. Process Query
                 val queryResult = sanitizeParameterString(uri.rawQuery, allParamsToRemove, communityRulePatterns)
                 val newQuery = queryResult.cleaned
                 if (queryResult.removed.isNotEmpty()) {
@@ -172,10 +197,9 @@ object UrlSanitizer {
                     isModified = true
                 }
                 
-                if (isModified && paramsRemovedFromThisUrl.isNotEmpty()) {
+                if (wasUnwrapped || (isModified && paramsRemovedFromThisUrl.isNotEmpty())) {
                     val newUriStr = buildString {
-                        // If original didn't have scheme, we added it for parsing, let's try to match original intent
-                        val hasScheme = originalUrlString.startsWith("http", ignoreCase = true)
+                        val hasScheme = workingUrl.startsWith("http", ignoreCase = true)
                         if (hasScheme) {
                             append(uri.scheme).append("://")
                         }
@@ -184,18 +208,16 @@ object UrlSanitizer {
                         if (newQuery != null) append("?").append(newQuery)
                         if (newFragment != null) append("#").append(newFragment)
                     }
-                    
-                    // Replace in text
+
                     val start = match.range.first
                     val end = match.range.last + 1
                     cleanedText = cleanedText.substring(0, start) + newUriStr + cleanedText.substring(end)
-                    
+
+                    if (wasUnwrapped) paramsRemovedFromThisUrl.add(0, "[redirect unwrapped]")
                     removedParams.add(RemovedParam(originalUrlString, paramsRemovedFromThisUrl))
                 }
-            } catch (e: URISyntaxException) {
-                // Ignore malformed URL
-            } catch (e: Exception) {
-                // Catch other potential parsing issues
+            } catch (_: URISyntaxException) {
+            } catch (_: Exception) {
             }
         }
         
@@ -206,7 +228,7 @@ object UrlSanitizer {
             cleanedText = cleanedText.replace(Regex("\\n{3,}"), "\n\n")
         }
         
-        return SanitizeResult(text, cleanedText, removedParams.reversed())
+        return SanitizeResult(text, cleanedText, removedParams.reversed(), shortenedUrls = detectedShorteners)
     }
 
     private fun decodeParameterKey(key: String): String = try {
@@ -303,6 +325,7 @@ data class RemovedParam(
 data class SanitizeResult(
     val original: String,
     val cleaned: String,
-    val removed: List<RemovedParam>
+    val removed: List<RemovedParam>,
+    val invisibleCharsRemoved: Int = 0,
+    val shortenedUrls: List<String> = emptyList()
 )
-

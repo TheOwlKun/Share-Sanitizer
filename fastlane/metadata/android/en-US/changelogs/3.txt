@@ -1,0 +1,7 @@
+New in v1.1.0:
+• Added stripping for invisible unicode fingerprinting characters
+• Added redirect unwrapping for tracking links (Google, Facebook, YouTube, etc.)
+• Added warnings when sharing shortened URLs (bit.ly, t.co, etc.)
+• Extracted all text into strings.xml to allow for community translations
+• Added toggles in Settings for the new features
+• Under the hood privacy improvements and compliance fixes for F-Droid/IzzyOnDroid
