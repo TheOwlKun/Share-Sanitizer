@@ -33,7 +33,7 @@
 * **Invisible Unicode Stripping**: Detects and removes hidden zero-width characters (U+200B, U+FEFF, etc.) that websites embed in copied text to fingerprint and track users.
 * **Image Metadata Stripping**: Safely decodes raw pixel data and strips all embedded EXIF metadata (GPS location, camera make/model, timestamps) before sharing.
 * **Zero Trust & Fully Offline**: Operates entirely on-device. Requires **zero** permissions (not even `INTERNET`). Nothing is ever uploaded, and no analytics are collected.
-* **Localization Ready**: All user-facing strings are externalized for community translations via F-Droid/IzzyOnDroid Weblate.
+* **Localization Ready**: All user-facing strings are externalized for community translations
 * **Material You Design**: A modern interface supporting Android 12+ dynamic theming, dark mode, and fluid micro-animations.
 
 ## 📱 How it Works
