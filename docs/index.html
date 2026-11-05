@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Privacy Policy — Share Sanitizer</title>
+  <style>
+    :root {
+      --bg: #0f1117;
+      --card: #181b24;
+      --text: #e6e8f0;
+      --muted: #9da4b8;
+      --accent: #7ee787;
+      --border: #2a2f3d;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.65;
+      margin: 0;
+      padding: 32px 16px;
+    }
+    .container {
+      max-width: 760px;
+      margin: 0 auto;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 32px;
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
+    }
+    h1 {
+      margin-top: 0;
+      font-size: 2rem;
+      color: #ffffff;
+    }
+    h2 {
+      margin-top: 28px;
+      font-size: 1.25rem;
+      color: var(--accent);
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 6px;
+    }
+    .badge {
+      display: inline-block;
+      background: rgba(126, 231, 135, 0.12);
+      color: var(--accent);
+      border: 1px solid rgba(126, 231, 135, 0.35);
+      border-radius: 999px;
+      padding: 4px 12px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-bottom: 12px;
+    }
+    p, li {
+      color: var(--text);
+    }
+    .muted {
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+    a {
+      color: var(--accent);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <span class="badge">100% Offline &bull; Zero Permissions</span>
+    <h1>Privacy Policy for Share Sanitizer</h1>
+    <p class="muted"><strong>Package ID:</strong> <code>com.sharesanitizer.app</code> &bull; <strong>Effective Date:</strong> November 5, 2026</p>
+
+    <p><strong>Share Sanitizer</strong> is a free, open-source Android privacy utility built with a strict <strong>zero-trust, offline-first</strong> architecture.</p>
+
+    <h2>1. Zero Data Collection</h2>
+    <p>Share Sanitizer <strong>does not collect, store, transmit, or share any personal data, usage analytics, telemetry, crash reports, or device identifiers</strong>.</p>
+
+    <h2>2. Zero Permissions &amp; 100% On-Device Processing</h2>
+    <ul>
+      <li><strong>No Network Access:</strong> The application does not request the <code>android.permission.INTERNET</code> permission in its AndroidManifest. It is technically incapable of making network requests or transmitting user data to any external server.</li>
+      <li><strong>Text &amp; URL Sanitization:</strong> When you share or paste text and URLs into Share Sanitizer, all tracking parameter removal, redirect unwrapping, and invisible Unicode character stripping happen strictly locally in your device's memory.</li>
+      <li><strong>Image Metadata (EXIF) Stripping:</strong> When you select or share images into Share Sanitizer, raw pixel data is decoded and re-encoded into a temporary local file in the app's private cache directory (<code>cacheDir/shared_images</code>) without embedded EXIF metadata (such as GPS coordinates, camera model, or timestamps). By default, this temporary cache is automatically cleared when the app starts.</li>
+      <li><strong>User Preferences:</strong> App settings (such as theme preference, custom tracking parameters, and image export format) are stored strictly locally on your device using Android Jetpack DataStore.</li>
+    </ul>
+
+    <h2>3. Third-Party Services &amp; SDKs</h2>
+    <p>Share Sanitizer contains <strong>no third-party analytics SDKs, no advertising SDKs, and no tracking libraries</strong>.</p>
+
+    <h2>4. Data Retention &amp; Deletion</h2>
+    <p>Because no data is ever transmitted off your device, all temporary data resides solely in your local app storage. You can clear all app data and cached files at any time via Android Settings or by uninstalling the application.</p>
+
+    <h2>5. Open Source Verification</h2>
+    <p>Share Sanitizer is licensed under the <strong>GNU General Public License v3.0 (GPL-3.0)</strong>.</p>
+
+    <h2>6. Contact</h2>
+    <p>If you have any questions regarding this Privacy Policy, you can contact the developer via the support email listed on the Google Play Store listing page.</p>
+  </div>
+</body>
+</html>
